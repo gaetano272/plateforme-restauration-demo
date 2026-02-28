@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FoodGuid — Annuaire Restaurants Halal</title>
+
+  <style>
+    :root{
+      --bg: #f5f7f6;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e5e7eb;
+
+      --green-900:#0b3b34;
+      --green-800:#0f4a41;
+      --green-700:#155a4f;
+      --green-600:#1d6a5f;
+
+      --orange:#f97316;
+      --orange-700:#ea580c;
+
+      --shadow: 0 12px 30px rgba(2, 6, 23, .12);
+      --shadow-soft: 0 10px 25px rgba(2, 6, 23, .10);
+      --radius: 18px;
+      --radius-sm: 12px;
+
+      --max: 1200px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:var(--bg);
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(var(--max), calc(100% - 40px)); margin:0 auto; }
+
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(255,255,255,.9);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px;
+      padding:14px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .pin{
+      width:34px; height:34px; border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, #2dd4bf, #0f766e);
+      display:grid; place-items:center;
+      color:white; box-shadow: 0 10px 20px rgba(15,118,110,.25);
+      font-size:18px;
+    }
+    .brand span b{ color: var(--orange); }
+    nav{
+      display:flex; align-items:center; gap:18px;
+      color:#0b1220;
+      font-weight:600;
+      font-size:14px;
+    }
+    nav a{ opacity:.8; }
+    nav a:hover{ opacity:1; }
+
+    .actions{
+      display:flex; align-items:center; gap:10px;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:#fff;
+      color:#111827;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:700;
+      font-size:14px;
+      display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow: 0 8px 18px rgba(2,6,23,.06);
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 12px 26px rgba(2,6,23,.10); }
+    .btn-primary{
+      border:none;
+      background: linear-gradient(180deg, #ff7a1a, var(--orange-700));
+      color:white;
+    }
+    .btn-icon{
+      width:40px; height:40px; border-radius:999px;
+      display:grid; place-items:center;
+      padding:0;
+    }
+
+    /* Hero */
+    .hero{
+      position:relative;
+      min-height: 420px;
+      background:
+        linear-gradient(180deg, rgba(8, 41, 37, .70), rgba(8, 41, 37, .90)),
+        url("https://images.unsplash.com/photo-1555992336-03a23c7b20b1?auto=format&fit=crop&w=2200&q=80");
+      background-size:cover;
+      background-position:center;
+      color:white;
+      overflow:hidden;
+    }
+    .hero-inner{
+      padding: 56px 0 34px;
+    }
+    .hero h1{
+      margin:0 0 10px;
+      font-size: clamp(28px, 3.2vw, 44px);
+      line-height:1.1;
+      letter-spacing:-.5px;
+    }
+    .hero p{
+      margin:0 0 26px;
+      color: rgba(255,255,255,.86);
+      max-width: 64ch;
+      font-size: 16px;
+    }
+
+    .searchbar{
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      display:grid;
+      grid-template-columns: 1.5fr 1fr 1fr auto;
+      gap: 10px;
+      align-items:center;
+    }
+    .field{
+      display:flex; align-items:center; gap:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-height: 46px;
+    }
+    .field .ico{ color: #0f766e; opacity:.9; }
+    .field input, .field select{
+      border:none; outline:none; width:100%;
+      font-size:14px;
+      background:transparent;
+      color:#0b1220;
+    }
+    .field select{ appearance:none; }
+    .btn-search{
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight:800;
+      border:none;
+      background: #ff1f63;
+      color:#fff;
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow: 0 12px 26px rgba(255,31,99,.22);
+      white-space:nowrap;
+    }
+    .btn-search:hover{ transform: translateY(-1px); filter: brightness(.98); }
+
+    .hero-cta{
+      margin-top: 14px;
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .add-restaurant{
+      background: linear-gradient(180deg, #ff7a1a, var(--orange-700));
+      border:none;
+      color:white;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow: 0 12px 26px rgba(249,115,22,.25);
+      transition:.18s ease;
+    }
+    .add-restaurant:hover{ transform: translateY(-1px); }
+
+    /* Main layout */
+    main{ padding: 26px 0 46px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      align-items:start;
+      margin-top: -40px; /* “remonte” sur le hero */
+    }
+
+    /* Sidebar filters */
+    .panel{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-soft);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding: 16px 16px 10px;
+      border-bottom:1px solid var(--line);
+      font-weight:900;
+      font-size:16px;
+    }
+    .panel .bd{ padding: 14px 16px 16px; }
+    .section{
+      padding: 10px 0 14px;
+      border-bottom:1px dashed rgba(100,116,139,.25);
+    }
+    .section:last-child{ border-bottom:none; padding-bottom:0; }
+    .section .ttl{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      font-weight:800;
+      margin-bottom:10px;
+      color:#0b1220;
+    }
+    .chip{
+      font-size:12px; font-weight:800;
+      padding:4px 10px;
+      border-radius:999px;
+      background: rgba(15,118,110,.08);
+      color:#0f766e;
+    }
+    .check{
+      display:flex; align-items:center; gap:10px;
+      padding: 7px 0;
+      color:#111827;
+      font-size:14px;
+    }
+    .check input{ width:16px; height:16px; accent-color: var(--green-700); }
+    .row{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      color: var(--muted);
+      font-size:13px;
+    }
+    .range{
+      width:100%;
+      accent-color: var(--green-700);
+    }
+    .filter-actions{
+      display:flex; gap:10px; margin-top:12px;
+    }
+    .btn-ghost{
+      flex:1;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btn-apply{
+      flex:1;
+      border:none;
+      background: var(--green-700);
+      color:#fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow: 0 12px 26px rgba(21,90,79,.18);
+    }
+
+    /* Results */
+    .results-head{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:12px;
+      margin: 8px 0 12px;
+    }
+    .results-head h2{
+      margin:0;
+      font-size: clamp(18px, 2.1vw, 26px);
+      letter-spacing:-.3px;
+    }
+    .results-meta{
+      color: var(--muted);
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow:hidden;
+      box-shadow: var(--shadow-soft);
+      transition:.18s ease;
+      position:relative;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(2,6,23,.14);
+    }
+    .card .media{
+      height: 170px;
+      background-size: cover;
+      background-position:center;
+      position:relative;
+    }
+    .badge{
+      position:absolute; top:12px; left:12px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(229,231,235,.8);
+      padding: 6px 10px;
+      font-weight:900;
+      border-radius:999px;
+      font-size:12px;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .badge .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: #ff1f63;
+    }
+
+    .card .body{ padding: 14px 14px 14px; }
+    .title{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .title h3{
+      margin:0;
+      font-size:18px;
+      letter-spacing:-.2px;
+    }
+    .fav{
+      width:36px; height:36px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      display:grid; place-items:center;
+      color:#0f766e;
+      background:#fff;
+      cursor:pointer;
+    }
+
+    .rating{
+      display:flex; align-items:center; gap:10px;
+      margin: 8px 0 10px;
+    }
+    .dots{
+      display:flex; align-items:center; gap:4px;
+    }
+    .rdot{
+      width:14px; height:14px; border-radius:999px;
+      border:2px solid #16a34a; /* vert */
+      background: transparent;
+      display:inline-block;
+    }
+    .rdot.filled{ background:#16a34a; }
+    .rdot.orange{ border-color:#f59e0b; }
+    .rdot.orange.filled{ background:#f59e0b; }
+    .reviews{
+      color: var(--muted);
+      font-weight:700;
+      font-size:13px;
+    }
+
+    .meta{
+      color: var(--muted);
+      font-size:13px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom: 12px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      background: rgba(15,118,110,.06);
+      border:1px solid rgba(15,118,110,.12);
+      padding: 6px 10px;
+      border-radius:999px;
+      font-weight:700;
+      color:#0f766e;
+    }
+
+    .card .cta{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .btn-card{
+      border:none;
+      background: var(--green-700);
+      color:white;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight:900;
+      cursor:pointer;
+      width: 60%;
+    }
+    .btn-card.alt{ background: linear-gradient(180deg, #ff7a1a, var(--orange-700)); }
+    .price{
+      font-weight:900;
+      color:#0b1220;
+      opacity:.85;
+    }
+
+    /* Newsletter */
+    .newsletter{
+      margin-top: 22px;
+      background: linear-gradient(180deg, var(--green-800), var(--green-900));
+      color:white;
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .newsletter .inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .newsletter h3{
+      margin:0 0 6px;
+      font-size:18px;
+      letter-spacing:-.2px;
+    }
+    .newsletter p{
+      margin:0;
+      color: rgba(255,255,255,.82);
+      font-weight:600;
+      font-size:13px;
+      max-width: 60ch;
+    }
+    .news-form{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .news-form input{
+      border:none;
+      outline:none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      min-width: 260px;
+    }
+    .news-form button{
+      border:none;
+      background: linear-gradient(180deg, #ff7a1a, var(--orange-700));
+      color:white;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 18px;
+      padding: 28px 0 36px;
+      color:#0b1220;
+    }
+    .foot{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: 16px;
+      align-items:start;
+    }
+    .foot .box{
+      background: #fff;
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 10px 25px rgba(2,6,23,.06);
+    }
+    .foot h4{
+      margin:0 0 10px;
+      font-size:14px;
+      font-weight:900;
+    }
+    .foot a{
+      display:block;
+      color: var(--muted);
+      font-weight:700;
+      padding: 6px 0;
+      font-size:13px;
+    }
+    .foot a:hover{ color:#0f766e; }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      nav{ display:none; }
+      .grid{ grid-template-columns: 1fr; margin-top: -24px; }
+      .cards{ grid-template-columns: 1fr; }
+      .searchbar{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <div class="topbar">
+      <a class="brand" href="#">
+        <div class="pin">📍</div>
+        <span>Food<b>Guid</b></span>
+      </a>
+
+      <nav aria-label="Navigation principale">
+        <a href="#">Maison</a>
+        <a href="#">Annonces</a>
+        <a href="#">Catégories</a>
+        <a href="#">Blog</a>
+        <a href="#">Contactez-nous</a>
+      </nav>
+
+      <div class="actions">
+        <button class="btn" type="button">🔐 Se connecter</button>
+        <button class="btn btn-primary" type="button">➕ Ajouter une annonce</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-inner">
+    <h1>Trouvez les meilleurs restaurants halal près de chez vous</h1>
+    <p>
+      Recherchez par nom, ville, catégorie ou date. Comparez les notes et les avis,
+      puis accédez aux fiches établissements.
+    </p>
+
+    <form class="searchbar" id="searchForm">
+      <div class="field">
+        <span class="ico">🔎</span>
+        <input id="q" type="text" placeholder="Que recherchez-vous ?" />
+      </div>
+
+      <div class="field">
+        <span class="ico">📍</span>
+        <select id="city">
+          <option value="">Ville ou région</option>
+          <option>Marseille</option>
+          <option>Paris</option>
+          <option>Lyon</option>
+          <option>Lille</option>
+          <option>Toulouse</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <span class="ico">📅</span>
+        <input id="date" type="date" />
+      </div>
+
+      <button class="btn-search" type="submit">Recherche</button>
+    </form>
+
+    <div class="hero-cta">
+      <button class="add-restaurant" type="button" id="addRestaurant">➕ Ajouter votre Restaurant</button>
+      <span style="color:rgba(255,255,255,.78);font-weight:700;font-size:13px;">
+        Compatible grille + filtres (Directorist / OneListing)
+      </span>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <div class="grid">
+
+      <!-- Sidebar -->
+      <aside class="panel" aria-label="Filtres">
+        <div class="hd">Filtres</div>
+        <div class="bd">
+
+          <div class="section">
+            <div class="ttl">
+              <span>Catégories</span>
+              <span class="chip" id="catCount">0</span>
+            </div>
+
+            <label class="check"><input type="checkbox" class="cat" value="Française" /> Cuisine Française</label>
+            <label class="check"><input type="checkbox" class="cat" value="Italienne" /> Cuisine Italienne</label>
+            <label class="check"><input type="checkbox" class="cat" value="Asiatique" /> Cuisine Asiatique</label>
+            <label class="check"><input type="checkbox" class="cat" value="Fast Food" /> Fast Food</label>
+            <label class="check"><input type="checkbox" class="cat" value="Bistro" /> Bars &amp; Bistros</label>
+          </div>
+
+          <div class="section">
+            <div class="ttl"><span>Prix</span><span class="chip" id="priceChip">€€</span></div>
+            <label class="check"><input type="radio" name="price" class="price" value="€" /> €</label>
+            <label class="check"><input type="radio" name="price" class="price" value="€€" checked /> €€</label>
+            <label class="check"><input type="radio" name="price" class="price" value="€€€" /> €€€</label>
+            <label class="check"><input type="radio" name="price" class="price" value="€€€€" /> €€€€</label>
+          </div>
+
+          <div class="section">
+            <div class="ttl"><span>Évaluation</span><span class="chip" id="rateChip">4+ ⭐</span></div>
+            <label class="check"><input type="radio" name="rating" class="ratingMin" value="5" /> 5 étoiles</label>
+            <label class="check"><input type="radio" name="rating" class="ratingMin" value="4" checked /> 4 étoiles &amp; plus</label>
+            <label class="check"><input type="radio" name="rating" class="ratingMin" value="3" /> 3 étoiles &amp; plus</label>
+          </div>
+
+          <div class="section">
+            <div class="ttl"><span>Distance</span><span class="chip" id="distChip">20 km</span></div>
+            <input id="distance" class="range" type="range" min="1" max="50" value="20" />
+            <div class="row">
+              <span>1 km</span><span>50 km</span>
+            </div>
+
+            <div class="filter-actions">
+              <button type="button" class="btn-ghost" id="resetBtn">Réinitialiser</button>
+              <button type="button" class="btn-apply" id="applyBtn">Appliquer</button>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Results -->
+      <section>
+        <div class="results-head">
+          <div>
+            <h2>Restaurants halal populaires près de chez vous</h2>
+            <div class="results-meta" id="resultsMeta">4 résultats</div>
+          </div>
+
+          <div class="results-meta" id="activeFilters">
+            Filtres : <b>Aucun</b>
+          </div>
+        </div>
+
+        <div class="cards" id="cards">
+
+          <!-- Card 1 -->
+          <article class="card"
+                   data-name="Le Gourmet"
+                   data-city="Marseille"
+                   data-cats="Française,Bistro"
+                   data-price="€€€"
+                   data-rating="4.6"
+                   data-reviews="245">
+            <div class="media" style="background-image:url('https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1400&q=80');">
+              <div class="badge"><span class="dot"></span> Populaire</div>
+            </div>
+            <div class="body">
+              <div class="title">
+                <h3>Le Gourmet</h3>
+                <button class="fav" type="button" title="Ajouter aux favoris">♡</button>
+              </div>
+
+              <div class="rating">
+                <div class="dots" aria-label="Note">
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot orange filled"></span>
+                </div>
+                <div class="reviews">245 avis</div>
+              </div>
+
+              <div class="meta">
+                <span class="pill">📍 Marseille</span>
+                <span class="pill">🍽 Française</span>
+                <span class="pill">✅ Halal</span>
+              </div>
+
+              <div class="cta">
+                <button class="btn-card" type="button">Voir la fiche →</button>
+                <span class="price">€€€</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card"
+                   data-name="La Trattoria"
+                   data-city="Marseille"
+                   data-cats="Italienne"
+                   data-price="€€"
+                   data-rating="4.2"
+                   data-reviews="180">
+            <div class="media" style="background-image:url('https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1400&q=80');">
+              <div class="badge"><span class="dot"></span> Populaire</div>
+            </div>
+            <div class="body">
+              <div class="title">
+                <h3>La Trattoria</h3>
+                <button class="fav" type="button" title="Ajouter aux favoris">♡</button>
+              </div>
+
+              <div class="rating">
+                <div class="dots" aria-label="Note">
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot orange filled"></span>
+                  <span class="rdot"></span>
+                </div>
+                <div class="reviews">180 avis</div>
+              </div>
+
+              <div class="meta">
+                <span class="pill">📍 Marseille</span>
+                <span class="pill">🍝 Italienne</span>
+                <span class="pill">✅ Halal</span>
+              </div>
+
+              <div class="cta">
+                <button class="btn-card alt" type="button">Voir la fiche →</button>
+                <span class="price">€€</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="card"
+                   data-name="Sushi Tokyo"
+                   data-city="Paris"
+                   data-cats="Asiatique"
+                   data-price="€€"
+                   data-rating="4.8"
+                   data-reviews="312">
+            <div class="media" style="background-image:url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1400&q=80');">
+              <div class="badge"><span class="dot"></span> Populaire</div>
+            </div>
+            <div class="body">
+              <div class="title">
+                <h3>Sushi Tokyo</h3>
+                <button class="fav" type="button" title="Ajouter aux favoris">♡</button>
+              </div>
+
+              <div class="rating">
+                <div class="dots" aria-label="Note">
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                </div>
+                <div class="reviews">312 avis</div>
+              </div>
+
+              <div class="meta">
+                <span class="pill">📍 Paris</span>
+                <span class="pill">🍣 Asiatique</span>
+                <span class="pill">✅ Halal</span>
+              </div>
+
+              <div class="cta">
+                <button class="btn-card" type="button">Voir la fiche →</button>
+                <span class="price">€€</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 4 -->
+          <article class="card"
+                   data-name="Bistro du Coin"
+                   data-city="Lyon"
+                   data-cats="Bistro,Fast Food"
+                   data-price="€"
+                   data-rating="4.0"
+                   data-reviews="158">
+            <div class="media" style="background-image:url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80');">
+              <div class="badge"><span class="dot"></span> Populaire</div>
+            </div>
+            <div class="body">
+              <div class="title">
+                <h3>Bistro du Coin</h3>
+                <button class="fav" type="button" title="Ajouter aux favoris">♡</button>
+              </div>
+
+              <div class="rating">
+                <div class="dots" aria-label="Note">
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot filled"></span>
+                  <span class="rdot orange filled"></span>
+                  <span class="rdot"></span>
+                </div>
+                <div class="reviews">158 avis</div>
+              </div>
+
+              <div class="meta">
+                <span class="pill">📍 Lyon</span>
+                <span class="pill">🍔 Bistro</span>
+                <span class="pill">✅ Halal</span>
+              </div>
+
+              <div class="cta">
+                <button class="btn-card alt" type="button">Voir la fiche →</button>
+                <span class="price">€</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="newsletter" style="margin-top:18px;">
+          <div class="inner">
+            <div>
+              <h3>Inscrivez-vous à notre newsletter !</h3>
+              <p>Recevez les dernières nouveautés et bons plans restaurants directement par e-mail.</p>
+            </div>
+
+            <form class="news-form" id="newsletterForm">
+              <input type="email" required placeholder="Votre adresse e-mail" />
+              <button type="submit">S’inscrire</button>
+            </form>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <footer>
+      <div class="foot">
+        <div class="box">
+          <div class="brand" style="margin-bottom:10px;">
+            <div class="pin">📍</div>
+            <span>Food<b>Guid</b></span>
+          </div>
+          <div style="color:var(--muted);font-weight:700;font-size:13px;line-height:1.45;">
+            Votre guide halal : trouvez rapidement où manger, explorez de nouvelles pépites,
+            et partagez vos avis.
+          </div>
+        </div>
+
+        <div class="box">
+          <h4>Liens utiles</h4>
+          <a href="#">Se connecter</a>
+          <a href="#">Ajouter une annonce</a>
+          <a href="#">Contactez-nous</a>
+          <a href="#">Blog</a>
+        </div>
+
+        <div class="box">
+          <h4>Principales catégories</h4>
+          <a href="#">Cuisine Française</a>
+          <a href="#">Cuisine Italienne</a>
+          <a href="#">Cuisine Asiatique</a>
+          <a href="#">Fast Food</a>
+        </div>
+
+        <div class="box">
+          <h4>Restez informé</h4>
+          <div style="color:var(--muted);font-weight:700;font-size:13px;line-height:1.45;">
+            Abonnez-vous pour recevoir les dernières nouvelles et offres exclusives.
+            Vous pouvez vous désabonner à tout moment.
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+  // Helpers
+  const $  = (sel, el=document) => el.querySelector(sel);
+  const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+
+  const cardsEl = $("#cards");
+  const resultsMeta = $("#resultsMeta");
+  const activeFiltersEl = $("#activeFilters");
+
+  function updateChips(){
+    const selectedCats = $$(".cat:checked").map(i => i.value);
+    $("#catCount").textContent = selectedCats.length;
+
+    const price = ($(".price:checked") || {}).value || "€€";
+    $("#priceChip").textContent = price;
+
+    const rMin = ($(".ratingMin:checked") || {}).value || "4";
+    $("#rateChip").textContent = `${rMin}+ ⭐`;
+
+    const dist = $("#distance").value;
+    $("#distChip").textContent = `${dist} km`;
+  }
+
+  function getFilters(){
+    const q = ($("#q").value || "").trim().toLowerCase();
+    const city = ($("#city").value || "").trim().toLowerCase();
+    const cats = $$(".cat:checked").map(i => i.value.toLowerCase());
+    const price = ($(".price:checked") || {}).value || "";
+    const ratingMin = parseFloat(($(".ratingMin:checked") || {}).value || "0");
+    const distance = parseInt($("#distance").value, 10);
+
+    return { q, city, cats, price, ratingMin, distance };
+  }
+
+  function applyFilters(){
+    const f = getFilters();
+
+    const cards = $$(".card", cardsEl);
+    let shown = 0;
+
+    cards.forEach(card => {
+      const name = (card.dataset.name || "").toLowerCase();
+      const cty  = (card.dataset.city || "").toLowerCase();
+      const cats = (card.dataset.cats || "").toLowerCase().split(",").map(s=>s.trim());
+      const price = card.dataset.price || "";
+      const rating = parseFloat(card.dataset.rating || "0");
+
+      // NOTE: la distance n’est pas calculée ici (pas de géoloc) -> on l’affiche juste en UI.
+      // Si tu veux, on peut brancher une vraie distance via API / coordonnées.
+
+      const matchQ = !f.q || name.includes(f.q);
+      const matchCity = !f.city || cty === f.city;
+      const matchCats = f.cats.length === 0 || f.cats.some(c => cats.includes(c));
+      const matchPrice = !f.price || price === f.price;
+      const matchRating = rating >= f.ratingMin;
+
+      const ok = matchQ && matchCity && matchCats && matchPrice && matchRating;
+
+      card.style.display = ok ? "" : "none";
+      if(ok) shown++;
+    });
+
+    resultsMeta.textContent = `${shown} résultat${shown>1 ? "s" : ""}`;
+
+    // Active filters label
+    const parts = [];
+    if(f.q) parts.push(`Mot-clé: <b>${escapeHtml(f.q)}</b>`);
+    if(f.city) parts.push(`Ville: <b>${escapeHtml(capitalize(f.city))}</b>`);
+    if(f.cats.length) parts.push(`Catégories: <b>${f.cats.map(capitalize).join(", ")}</b>`);
+    if(f.price) parts.push(`Prix: <b>${escapeHtml(f.price)}</b>`);
+    if(f.ratingMin) parts.push(`Note: <b>${f.ratingMin}+</b>`);
+    parts.push(`Distance: <b>${f.distance} km</b>`);
+
+    activeFiltersEl.innerHTML = `Filtres : ${parts.length ? parts.join(" · ") : "<b>Aucun</b>"}`;
+
+    updateChips();
+  }
+
+  function resetFilters(){
+    $("#q").value = "";
+    $("#city").value = "";
+    $$(".cat").forEach(i => i.checked = false);
+    $$(".price").forEach(i => i.checked = (i.value === "€€"));
+    $$(".ratingMin").forEach(i => i.checked = (i.value === "4"));
+    $("#distance").value = 20;
+
+    applyFilters();
+  }
+
+  function capitalize(s){ return (s||"").charAt(0).toUpperCase() + (s||"").slice(1); }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  }
+
+  // Events
+  $("#searchForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    applyFilters();
+  });
+
+  $("#applyBtn").addEventListener("click", applyFilters);
+  $("#resetBtn").addEventListener("click", resetFilters);
+
+  $$(".cat").forEach(el => el.addEventListener("change", applyFilters));
+  $$(".price").forEach(el => el.addEventListener("change", applyFilters));
+  $$(".ratingMin").forEach(el => el.addEventListener("change", applyFilters));
+  $("#distance").addEventListener("input", updateChips);
+  $("#distance").addEventListener("change", applyFilters);
+
+  $("#addRestaurant").addEventListener("click", () => {
+    alert("CTA : rediriger vers la page 'Ajouter votre restaurant' (ex: /ajouter-restaurant)");
+  });
+
+  $$(".fav").forEach(btn => btn.addEventListener("click", () => {
+    btn.textContent = (btn.textContent.trim() === "♡") ? "♥" : "♡";
+  }));
+
+  $("#newsletterForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    alert("Merci ! (brancher ici Mailchimp / Brevo / etc.)");
+    e.target.reset();
+  });
+
+  // Init
+  updateChips();
+  applyFilters();
+</script>
+
+</body>
+</html>
